@@ -1,1 +1,3 @@
-'sample data'/
+.env
+sample data
+app_draft.py
