@@ -3,7 +3,7 @@ import tempfile
 import os 
 import base64
 
-from extraction_ocr import ocr_extraction, filter_text_elements
+from extraction_ocr import ocr_extraction, image_element_items, table_element_items
 
 #Create a temporary directory to store uplaoded documents
 def create_temp_dir(uploaded_file): 
@@ -20,7 +20,7 @@ def create_temp_dir(uploaded_file):
 
 # Main function to perform OCR and text extraction
 def run_ocr(uploaded_file): 
-    text_elements = []
+    #text_elements = []
     raw_elements = []
 
     if uploaded_file is not None: 
@@ -28,9 +28,9 @@ def run_ocr(uploaded_file):
 
         if uploaded_file.type == 'application/pdf': 
             raw_elements = ocr_extraction(file_name=temp_file_path, output_dir=output_dir)
-            text_elements = filter_text_elements(raw_elements)
+            #text_elements = filter_text_elements(raw_elements)
 
-            return text_elements, temp_file_path
+            return raw_elements, temp_file_path
         else: 
             print("No PDF file found")
     else: 
@@ -51,9 +51,9 @@ def show_uploaded_docs(uploaded_file, temp_file_path):
             pdf_display = f'<iframe src="data:application/pdf;base64,{pdf_base64}" height="500" width="100%" type="application/pdf"></iframe>'
             st.markdown(pdf_display, unsafe_allow_html=True)
     else:
-        st.write("No file found")
+        st.write("No file found")  
 
-def show_extracted_text(elements):
+def filter_extracted_text(raw_elements): 
 
     # Add custom CSS to style the container
     st.markdown(
@@ -74,13 +74,19 @@ def show_extracted_text(elements):
 
     # Create a container with the custom class
     container_html = '<div class="scrollable-container">'
-    for element in elements:
-        container_html += f"<p>{element}</p>"
-    container_html += '</div>'
+    for element in raw_elements:
+        if type(element) in image_element_items or type(element) in table_element_items:
+            container_html += f"""<p style= "text-align:center;"> 
+            ----------------IMAGE / TABLE -------------------- <br> 
+            {element} <br> 
+            ---------------------------------------------- 
+            </p><br>"""
+        else: 
+            container_html += f"<p>{element}</p><br>"
+    container_html += '</div>'   
 
     # Render the container with the elements inside
     st.markdown(container_html, unsafe_allow_html=True)
-    
 
 def main(): 
     st.set_page_config(page_title="Doc Extractor", layout="wide")
@@ -92,7 +98,7 @@ def main():
     uploaded_file = st.file_uploader("Choose a file", type=["pdf"])
 
     if uploaded_file is not None: 
-        text_elements, temp_file_path = run_ocr(uploaded_file)
+        raw_elements, temp_file_path = run_ocr(uploaded_file)
 
         with st.container():
             left_column, right_column = st.columns(2)
@@ -103,11 +109,9 @@ def main():
 
             with right_column: 
                 with st.expander("Show Extracted Text"):
-                    show_extracted_text(text_elements)
+                    filter_extracted_text(raw_elements)
                     
 
-
-
-
+                    
 if __name__ == "__main__": 
     main()

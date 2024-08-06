@@ -1,9 +1,8 @@
 import unstructured
+import unstructured.documents
+import unstructured.documents.elements
 from unstructured.partition.pdf import partition_pdf
 
-#path = r"C:/Ali Vijdaan/OCR/data-extraction-OCR/sample data/"
-#file_name = r"Corporate Comprehensive EDI.pdf"
-#output_dir = "Image Extractions"
 
 #Function for OCR Extraction from PDFs
 def ocr_extraction(file_name, output_dir): 
@@ -28,6 +27,9 @@ text_element_items = [unstructured.documents.elements.Text,
 
 image_element_items = [unstructured.documents.elements.Image]
 
+table_element_items = [unstructured.documents.elements.Table, 
+                       unstructured.documents.elements.TableChunk]
+
 def filter_text_elements(raw_elements): 
     text_elements = []
 
@@ -37,6 +39,26 @@ def filter_text_elements(raw_elements):
         else: continue
 
     return text_elements
+
+def filter_image_elements(raw_elements): 
+    image_elements = []
+
+    for ele in raw_elements: 
+        if type(ele) in image_element_items: 
+            image_elements.append(ele)
+        else: continue 
+    
+    return image_elements
+
+def filter_table_elements(raw_elements): 
+    table_elements = []
+
+    for ele in raw_elements: 
+        if type(ele) in table_element_items: 
+            table_elements.append(ele)
+        else: continue 
+    
+    return table_elements
     
     
 

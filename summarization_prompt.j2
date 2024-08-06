@@ -1,0 +1,25 @@
+**Task:** Analyze the image provided and perform the following actions based on the context 
+
+1. **If the image contains solely text:** 
+- Extract the text from the image  
+- Ensure the extracted text is accurate and complete 
+
+2. **If the image contains diagrams or pictures:** 
+- Provide a short summary describing the main elements and purpose of the diagram or picture. 
+- Highlight any important details or components 
+
+**Image Description:** 
+{{ image_description }}
+
+**Response:** 
+
+{% if image_contains_text_only %}
+Extracted text from the image: 
+{% for line in extracted_text %}
+{{ line }}
+{{% endfor %}}
+
+{% else %
+Summary of the image: 
+{{ iamge_summary }}
+{% endif %}
